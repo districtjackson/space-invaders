@@ -1,10 +1,12 @@
 extends Area2D
 
 @export var speed = 500
+@export var shoot_cooldown = 1000
 @export var projectile_scene: PackedScene
 
 var paddle_length
 var screen_size
+var last_shot = 0
 
 var rocket_sprite = load("res://icon.svg")
 
@@ -14,8 +16,9 @@ func _ready():
 	paddle_length = $CollisionShape2D.shape.size.x / 2
 
 func _process(delta):
-	if(Input.is_action_pressed("shoot")):
+	if(Input.is_action_pressed("shoot") && (Time.get_ticks_msec() - last_shot) > shoot_cooldown):
 		_shoot()
+		last_shot = Time.get_ticks_msec()
 		
 	var velocity = Vector2.ZERO # Player's movement vector
 									
@@ -30,5 +33,5 @@ func _process(delta):
 func _shoot():
 	var rocket = projectile_scene.instantiate()
 	rocket.get_child(0).texture = rocket_sprite
-	rocket.position = Vector2(randf_range(0, 500), randf_range(0, 500))
+	rocket.position = Vector2(position.x, position.y - 130)
 	get_parent().add_child(rocket)

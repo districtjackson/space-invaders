@@ -1,13 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://df6f78rc4ii6l"]
+[gd_scene load_steps=5 format=3 uid="uid://df6f78rc4ii6l"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_q1vyo"]
 [ext_resource type="Texture2D" uid="uid://dgdbhsb1b3u3x" path="res://icon.svg" id="2_6110d"]
+[ext_resource type="PackedScene" uid="uid://b6qpr5w3wnv6a" path="res://projectile.tscn" id="2_menp4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4esq8"]
 size = Vector2(128, 128)
 
 [node name="Player" type="Area2D"]
 script = ExtResource("1_q1vyo")
+projectile_scene = ExtResource("2_menp4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_4esq8")

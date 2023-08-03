@@ -5,5 +5,4 @@
 [node name="Main" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_t7ckm")]
-position = Vector2(641, 432)
-scale = Vector2(0.6, 0.6)
+position = Vector2(623, 873)

@@ -13,6 +13,8 @@ extends Node2D
 # Enemy grid
 var enemies = []
 
+var remaining_enemies = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	_spawn_enemies()
@@ -34,9 +36,17 @@ func _spawn_enemies():
 			
 			enemies[i][j].position = Vector2(x_tally, y_tally)
 			
+			enemies[i][j].enemy_destroyed.connect(change_enemy_count)
+			
 			add_child(enemies[i][j])
 			
 			x_tally += enemy_hori_distance
 		
 		x_tally = enemy_pos_x
 		y_tally += enemy_vert_distance
+		
+	remaining_enemies = enemy_row_count * enemy_col_count
+
+# Called when an enemy dies, telling main to decrease count of remaining enemies
+func change_enemy_count():
+	remaining_enemies -= 1

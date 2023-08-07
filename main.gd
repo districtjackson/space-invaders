@@ -111,6 +111,51 @@ func _enemies_change_direction():
 	
 	return
 
+func _shoot_enemies():
+	# Game randomly chooses between shooting wide and having the closest enemy shoot at player
+	
+	# If shooting at player, go through each column and see which has an alive enemy closest to the player (column priority)
+	# Then instaniate rocket right below alien
+	
+	# If shooting randomly, generate a random number, and then iterate through the columns, ticking
+	# off the count with each one (if a column has zero aliens, it doesn't count)
+	# Once the counter is chosen, find the lowest alien and shoot.
+	if(randf() > 0.8):
+		_shoot_randomly()
+	else:
+		_shoot_at_player()
+
+# Finds the closest enemy to shoot
+func _shoot_at_player():
+	var player_x = $Player.position.x
+	var x_difference = 2000 # Minimum difference in x value's between player and any enemy
+	var closest_column = 0
+	
+	# Find column with existing enemies closest to player
+	for j in range(enemy_row_count): # Columns
+		
+		for i in range(enemy_col_count): # Rows
+			if(enemies[i][j] == null):
+				continue
+			else:
+				if(abs(enemies[i][j] - player_x) < x_difference):
+					x_difference = abs(enemies[i][j] - player_x)
+					closest_column = j
+					break
+	
+	# Find lowest enemy
+	for i in range(enemy_col_count -1, -1, -1): # Start from the bottom
+		if(enemies[i][closest_column] != null):
+			_shoot_projectile(enemies[i][closest_column])
+	
+# Chooses a random enemy to shoot
+func _shoot_randomly():
+	_shoot_projectile(1)
+	
+# Once the enemy to shoot is chosen, actually do the firing
+func _shoot_projectile(enemy):
+	pass
+	
 # Called when an enemy dies, telling main to decrease count of remaining enemies
 func change_enemy_count():
 	remaining_enemies -= 1

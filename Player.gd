@@ -34,4 +34,5 @@ func _shoot():
 	var rocket = projectile_scene.instantiate()
 	rocket.get_child(0).texture = rocket_sprite
 	rocket.position = Vector2(position.x, position.y - 130)
+	rocket.set_direction(1)
 	get_parent().add_child(rocket)

@@ -19,9 +19,11 @@ func _process(delta):
 	if(position.y <= 0 - projectile_length or position.y >= screen_size.y + projectile_length):
 		queue_free()
 
-
 func _on_area_entered(area):
 	queue_free()
 
 func set_direction(d):
 	direction = d
+	
+func destroy():
+	queue_free()

@@ -4,6 +4,7 @@ signal direction_switched
 
 @export var enemy_scene: PackedScene
 @export var projectile_scene: PackedScene
+@export var player_scene: PackedScene
 
 var rocket_sprite = load("res://icon.svg")
 
@@ -32,19 +33,36 @@ var enemy_hori_movement_direction = 1 # Should be 1 or -1
 var enemy_row_movement_timer
 var direction_change_last_move = false
 var last_enemy_shot = 0
+var lives = 3
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_spawn_enemies()
 	enemy_row_movement_timer = float(enemy_movement_speed) / float(enemy_col_count) # All rows should move before the cycle restarts
 	enemy_shooting_cooldown *= 1000
-	_move_enemies()
+	lives = 3
+	_start_game()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if(Time.get_ticks_msec() - last_enemy_shot > enemy_shooting_cooldown):
 		_shoot_enemies()
 		last_enemy_shot = Time.get_ticks_msec()
+
+func _start_game():
+	
+	_spawn_player()
+	print("Starting game")
+	await _spawn_enemies()
+	_move_enemies()
+
+func _spawn_player():
+	var player = player_scene.instantiate()
+	
+	player.position = Vector2(623, 873)
+	
+	player.life_lost.connect(_on_player_life_lost)
+	
+	add_child(player)
 
 func _spawn_enemies():	
 	var y_tally = enemy_pos_y
@@ -129,10 +147,10 @@ func _shoot_enemies():
 	# off the count with each one (if a column has zero aliens, it doesn't count)
 	# Once the counter is chosen, find the lowest alien and shoot.
 	
-	if(randf() > 0.8):
-		_shoot_randomly()
-	else:
+	if(randf() < 0.2 and $Player != null):
 		_shoot_at_player()
+	else:
+		_shoot_randomly()
 
 # Finds the closest enemy to shoot
 func _shoot_at_player():
@@ -192,3 +210,28 @@ func _shoot_projectile(enemy):
 # Called when an enemy dies, telling main to decrease count of remaining enemies
 func change_enemy_count():
 	remaining_enemies -= 1
+
+func _on_player_life_lost():
+	lives -= 1
+
+	_reset_round()
+	
+	if(lives <= 0):
+		_end_game()
+		
+func _reset_round():
+	_clear_enemies()
+	
+	_spawn_player()
+	_spawn_enemies()
+
+func _end_game():
+	_clear_enemies()
+	$Player.queue_free()
+	_start_game()
+	
+func _clear_enemies():
+	# Delete all remaining enemies and projectiles
+	for i in self.get_children():
+		if(i.has_method("destroy")):
+			i.destroy()

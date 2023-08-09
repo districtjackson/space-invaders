@@ -9,6 +9,7 @@
 script = ExtResource("1_ttow7")
 enemy_scene = ExtResource("2_w0tq7")
 projectile_scene = ExtResource("3_e8bls")
+player_scene = ExtResource("1_t7ckm")
 enemy_row_count = 2
 enemy_col_count = 5
 enemy_pos_x = 500
@@ -16,6 +17,3 @@ enemy_pos_y = 100
 enemy_hori_distance = 100
 enemy_vert_distance = 100
 enemy_hori_movement_distance = 40
-
-[node name="Player" parent="." instance=ExtResource("1_t7ckm")]
-position = Vector2(623, 873)

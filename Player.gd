@@ -1,5 +1,7 @@
 extends Area2D
 
+signal life_lost
+
 @export var speed = 500
 @export var shoot_cooldown = 1000
 @export var projectile_scene: PackedScene
@@ -36,3 +38,8 @@ func _shoot():
 	rocket.position = Vector2(position.x, position.y - 130)
 	rocket.set_direction(1)
 	get_parent().add_child(rocket)
+	
+
+func _on_area_entered(area):
+	life_lost.emit()
+	queue_free()

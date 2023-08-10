@@ -33,7 +33,9 @@ var enemy_hori_movement_direction = 1 # Should be 1 or -1
 var enemy_row_movement_timer
 var direction_change_last_move = false
 var last_enemy_shot = 0
+
 var lives = 3
+var score = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -49,8 +51,10 @@ func _start_game():
 	enemy_row_movement_timer = float(enemy_movement_speed) / float(enemy_col_count) # Starting value for how fast all rows move
 	lives = 3
 	
+	score = 0
+	$HUD.change_score(score)
+	
 	_spawn_player()
-	print("Starting game")
 	await _spawn_enemies()
 	_move_enemies()
 
@@ -209,6 +213,9 @@ func _shoot_projectile(enemy):
 # Called when an enemy dies, telling main to decrease count of remaining enemies
 func change_enemy_count():
 	remaining_enemies -= 1
+	
+	score += 100
+	$HUD.change_score(score)
 
 func _on_player_life_lost():
 	lives -= 1

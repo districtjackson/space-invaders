@@ -13,13 +13,21 @@ func _process(delta):
 func _start_game():
 	_toggle_main_menu()
 	start_game.emit()
+	_toggle_in_game()
+	
+func change_score(score):
+	$Score.text = str(score)
 	
 func _quit_game():
 	get_tree().queue_free()
 	
 func game_over():
+	_toggle_in_game()
 	_toggle_main_menu()
 
 func _toggle_main_menu():
 	$StartGame.visible = !$StartGame.visible
 	$QuitGame.visible = !$QuitGame.visible
+
+func _toggle_in_game():
+	$Score.visible = !$Score.visible

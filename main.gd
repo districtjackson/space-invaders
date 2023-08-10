@@ -37,10 +37,7 @@ var lives = 3
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	enemy_row_movement_timer = float(enemy_movement_speed) / float(enemy_col_count) # All rows should move before the cycle restarts
 	enemy_shooting_cooldown *= 1000
-	lives = 3
-	_start_game()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -49,6 +46,8 @@ func _process(delta):
 		last_enemy_shot = Time.get_ticks_msec()
 
 func _start_game():
+	enemy_row_movement_timer = float(enemy_movement_speed) / float(enemy_col_count) # Starting value for how fast all rows move
+	lives = 3
 	
 	_spawn_player()
 	print("Starting game")
@@ -214,10 +213,11 @@ func change_enemy_count():
 func _on_player_life_lost():
 	lives -= 1
 
-	_reset_round()
-	
 	if(lives <= 0):
 		_end_game()
+		return
+
+	_reset_round()
 		
 func _reset_round():
 	_clear_enemies()
@@ -228,7 +228,7 @@ func _reset_round():
 func _end_game():
 	_clear_enemies()
 	$Player.queue_free()
-	_start_game()
+	$HUD.game_over()
 	
 func _clear_enemies():
 	# Delete all remaining enemies and projectiles

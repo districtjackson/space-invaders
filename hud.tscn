@@ -51,5 +51,14 @@ visible = false
 offset_right = 40.0
 offset_bottom = 23.0
 
+[node name="HighScore" type="Label" parent="."]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 23.0
+grow_horizontal = 0
+
 [connection signal="pressed" from="StartGame" to="." method="_start_game"]
 [connection signal="pressed" from="QuitGame" to="." method="_quit_game"]

@@ -16,7 +16,10 @@ func _start_game():
 	_toggle_in_game()
 	
 func change_score(score):
-	$Score.text = str(score)
+	$Score.set_text(str(score))
+	
+func set_high_score(high_score):
+	$HighScore.set_text(str(high_score))
 	
 func _quit_game():
 	get_tree().queue_free()
@@ -31,3 +34,4 @@ func _toggle_main_menu():
 
 func _toggle_in_game():
 	$Score.visible = !$Score.visible
+	$HighScore.visible = !$HighScore.visible

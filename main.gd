@@ -36,10 +36,16 @@ var last_enemy_shot = 0
 
 var lives = 3
 var score = 0
+var high_score = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	enemy_shooting_cooldown *= 1000
+	
+	var temp_score = _get_high_score()
+	
+	if(temp_score != null):
+		high_score = temp_score
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -53,6 +59,7 @@ func _start_game():
 	
 	score = 0
 	$HUD.change_score(score)
+	$HUD.set_high_score(high_score)
 	
 	_spawn_player()
 	await _spawn_enemies()
@@ -237,8 +244,57 @@ func _end_game():
 	$Player.queue_free()
 	$HUD.game_over()
 	
+	if(score > high_score):
+		high_score = score
+		_save_high_score(high_score)
+	
 func _clear_enemies():
 	# Delete all remaining enemies and projectiles
 	for i in self.get_children():
 		if(i.has_method("destroy")):
 			i.destroy()
+
+# Saves provided high score at user://space_invaders.save
+func _save_high_score(high_score):
+	print("Saving game...")
+	
+	var save_dict = {
+		"score" : high_score
+	}
+	
+	var save = FileAccess.open("user://space_invaders.save", FileAccess.WRITE)
+	
+	var json_string = JSON.stringify(save_dict)
+	
+	save.store_line(json_string)
+	
+	print("High score saved")
+	
+	return
+	
+func _get_high_score():
+	# See if a save high score even exists
+	if not FileAccess.file_exists("user://space_invaders.save"):
+		print("Save game file does not exist")
+		return # Error! We don't have a save to load.
+
+	# Open save file
+	var save = FileAccess.open("user://space_invaders.save", FileAccess.READ)
+	
+	# Get JSON line
+	var json_string = save.get_line()
+	
+	# Helper class to interact with JSON
+	var json = JSON.new()
+	
+	# Error checking
+	var parse_result = json.parse(json_string)
+	if not parse_result == OK:
+		print("JSON Parse Error: ", json.get_error_message(), " in ", json_string, " at line ", json.get_error_line())
+	
+	# Get data from JSON object
+	var node_data = json.get_data()
+	
+	print(node_data["score"])
+	
+	return node_data["score"]

@@ -34,6 +34,10 @@ var enemy_row_movement_timer
 var direction_change_last_move = false
 var last_enemy_shot = 0
 
+# Amount enemy movement speed increases with each enemy dead. 
+		# By the end, the enemies should move 4x faster
+var enemy_row_movement_timer_interval = 0 
+
 var lives = 3
 var score = 0
 var high_score = 0
@@ -41,7 +45,7 @@ var high_score = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	enemy_shooting_cooldown *= 1000
-	
+
 	high_score = _get_high_score()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -52,6 +56,8 @@ func _process(delta):
 
 func _start_game():
 	enemy_row_movement_timer = float(enemy_movement_speed) / float(enemy_col_count) # Starting value for how fast all rows move
+	enemy_row_movement_timer_interval = (enemy_row_movement_timer * 0.75) / enemy_row_count * enemy_col_count
+	
 	lives = 3
 	
 	score = 0
@@ -214,9 +220,11 @@ func _shoot_projectile(enemy):
 	rocket.set_direction(-1)
 	add_child(rocket)
 	
-# Called when an enemy dies, telling main to decrease count of remaining enemies
+# Called when an enemy dies, telling main to decrease count of remaining enemies, increase score, and speed up enemies
 func change_enemy_count():
 	remaining_enemies -= 1
+	
+	enemy_row_movement_timer = enemy_row_movement_timer - enemy_row_movement_timer_interval
 	
 	score += 100
 	$HUD.change_score(score)

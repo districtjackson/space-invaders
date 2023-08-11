@@ -42,10 +42,7 @@ var high_score = 0
 func _ready():
 	enemy_shooting_cooldown *= 1000
 	
-	var temp_score = _get_high_score()
-	
-	if(temp_score != null):
-		high_score = temp_score
+	high_score = _get_high_score()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -276,7 +273,7 @@ func _get_high_score():
 	# See if a save high score even exists
 	if not FileAccess.file_exists("user://space_invaders.save"):
 		print("Save game file does not exist")
-		return # Error! We don't have a save to load.
+		return 0 # Error! We don't have a save to load.
 
 	# Open save file
 	var save = FileAccess.open("user://space_invaders.save", FileAccess.READ)

@@ -44,6 +44,9 @@ var high_score = 0
 
 var Player
 
+var enemies_moving = false
+var in_game = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	enemy_shooting_cooldown *= 1000
@@ -59,7 +62,7 @@ func _process(delta):
 		last_enemy_shot = Time.get_ticks_msec()
 
 func _start_game():
-	enemy_row_movement_timer = float(enemy_movement_speed) / float(enemy_col_count) # Starting value for how fast all rows move
+	_reset_enemy_speed() # Starting value for how fast all rows move
 	enemy_row_movement_timer_interval = (enemy_row_movement_timer * 0.75) / enemy_row_count * enemy_col_count
 	
 	lives = 3
@@ -70,7 +73,13 @@ func _start_game():
 	
 	_spawn_player()
 	await _spawn_enemies()
-	_move_enemies()
+	
+	in_game = true
+	
+	# If game restarts, make sure that it doesn't start another enemy moving process
+	if enemies_moving == false:
+		_move_enemies()
+		enemies_moving = true
 
 func _spawn_player():
 	Player = player_scene.instantiate()
@@ -84,6 +93,7 @@ func _spawn_player():
 func _spawn_enemies():	
 	var y_tally = enemy_pos_y
 	var x_tally = enemy_pos_x
+	enemy_hori_movement_direction = 1 # Enemies should always start moving to the left
 	
 	for i in range(enemy_col_count): # Rows
 		enemies.append([])
@@ -96,7 +106,7 @@ func _spawn_enemies():
 			
 			enemies[i][j].enemy_destroyed.connect(change_enemy_count)
 			
-			add_child(enemies[i][j])
+			call_deferred("add_child", enemies[i][j])
 			
 			x_tally += enemy_hori_distance
 		
@@ -104,6 +114,9 @@ func _spawn_enemies():
 		y_tally += enemy_vert_distance
 		
 	remaining_enemies = enemy_row_count * enemy_col_count
+	
+	return
+
 
 func _move_enemies():
 	
@@ -111,6 +124,14 @@ func _move_enemies():
 	var enemy_reached_bound = false
 	
 	for i in range(enemy_col_count - 1, -1, -1): # Rows. Works backwards because the bottom rows should move first
+		# This is needed to continually reset the chosen row to the bottom one if the game is currently not running.
+		# Without it, the enemies of the second game will most likely start moving on some other row
+		if in_game == false:
+			i = enemy_col_count
+			await get_tree().create_timer(0.25).timeout # Without this timer, there will be infinite recursion
+			continue
+		
+		print("Row being moved: ", i)
 		
 		for j in range(enemy_row_count): # Columns
 			if(enemies[i][j] == null):
@@ -235,34 +256,48 @@ func change_enemy_count():
 	$HUD.change_score(score)
 
 func _on_player_life_lost():
+	in_game = false
+	
 	# Might be a race condition if a player gets shot at the same time that the enemies hit the bottom
 	lives -= 1
+
+	_clear_entities()
+	_reset_enemy_speed()
 
 	if(lives <= 0):
 		_end_game()
 		return
 
 	_reset_round()
-		
+
+
 func _reset_round():
-	_clear_entities()
-	
 	_spawn_player()
 	_spawn_enemies()
+	in_game = true
+
 
 func _end_game():
-	_clear_entities()
+	in_game = false
+	
+	
 	$HUD.game_over()
 	
 	if(score > high_score):
 		high_score = score
 		_save_high_score(high_score)
-	
+
+
+func _reset_enemy_speed():
+	enemy_row_movement_timer = float(enemy_movement_speed) / float(enemy_col_count)
+
+
 func _clear_entities():
 	# Delete all remaining enemies and projectiles
 	for i in self.get_children():
 		if(i.has_method("destroy")):
 			i.destroy()
+
 
 # Saves provided high score at user://space_invaders.save
 func _save_high_score(high_score):
@@ -281,7 +316,8 @@ func _save_high_score(high_score):
 	print("High score saved")
 	
 	return
-	
+
+
 func _get_high_score():
 	# See if a save high score even exists
 	if not FileAccess.file_exists("user://space_invaders.save"):

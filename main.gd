@@ -42,6 +42,8 @@ var lives = 3
 var score = 0
 var high_score = 0
 
+var Player
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	enemy_shooting_cooldown *= 1000
@@ -71,7 +73,7 @@ func _start_game():
 	_move_enemies()
 
 func _spawn_player():
-	var Player = player_scene.instantiate()
+	Player = player_scene.instantiate()
 	
 	Player.position = Vector2(490, 1200)
 	
@@ -163,14 +165,14 @@ func _shoot_enemies():
 	# off the count with each one (if a column has zero aliens, it doesn't count)
 	# Once the counter is chosen, find the lowest alien and shoot.
 	
-	if(randf() < 0.2 and $Player != null):
+	if(randf() < 0.2 and Player != null):
 		_shoot_at_player()
 	else:
 		_shoot_randomly()
 
 # Finds the closest enemy to shoot
 func _shoot_at_player():
-	var player_x = $Player.position.x
+	var player_x = Player.position.x
 	var x_difference = 2000 # Minimum difference in x value's between player and any enemy
 	var closest_column = 0
 	

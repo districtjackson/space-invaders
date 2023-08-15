@@ -42,4 +42,6 @@ func _shoot():
 
 func _on_area_entered(area):
 	life_lost.emit()
+
+func destroy():
 	queue_free()

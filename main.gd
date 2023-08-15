@@ -1,7 +1,5 @@
 extends Node2D
 
-signal direction_switched
-
 @export var enemy_scene: PackedScene
 @export var projectile_scene: PackedScene
 @export var player_scene: PackedScene
@@ -18,8 +16,8 @@ var rocket_sprite = load("res://icon.svg")
 
 @export var enemy_hori_movement_distance = 10 # How far the enemies move each time they move left or right
 @export var enemy_vert_movement_distance = 50 # How far the enemies move each time they go down
-@export var left_bound = 20
-@export var right_bound = 940
+@export var lateral_bound = 20
+@export var bottom = 900
 
 # Enemy settings
 @export var enemy_movement_speed = 1
@@ -34,6 +32,8 @@ var enemy_row_movement_timer
 var direction_change_last_move = false
 var last_enemy_shot = 0
 
+var screen_size
+
 # Amount enemy movement speed increases with each enemy dead. 
 		# By the end, the enemies should move 4x faster
 var enemy_row_movement_timer_interval = 0 
@@ -45,6 +45,8 @@ var high_score = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	enemy_shooting_cooldown *= 1000
+
+	screen_size = get_viewport_rect().size
 
 	high_score = _get_high_score()
 
@@ -69,13 +71,13 @@ func _start_game():
 	_move_enemies()
 
 func _spawn_player():
-	var player = player_scene.instantiate()
+	var Player = player_scene.instantiate()
 	
-	player.position = Vector2(623, 873)
+	Player.position = Vector2(490, 1200)
 	
-	player.life_lost.connect(_on_player_life_lost)
+	Player.life_lost.connect(_on_player_life_lost)
 	
-	add_child(player)
+	add_child(Player)
 
 func _spawn_enemies():	
 	var y_tally = enemy_pos_y
@@ -115,7 +117,7 @@ func _move_enemies():
 			enemies[i][j].position.x += move_vector
 			
 			# Once one enemy reaches the end, they wait for the current movement cycle to end, and then shift down and start moving the other direction
-			if(enemies[i][j].position.x <= left_bound or enemies[i][j].position.x >= right_bound and direction_change_last_move == false):
+			if(enemies[i][j].position.x <= lateral_bound or enemies[i][j].position.x >= screen_size.x - lateral_bound and direction_change_last_move == false):
 				enemy_reached_bound = true
 			
 		await get_tree().create_timer(enemy_row_movement_timer).timeout # Pause between rows to recreate the staggered effect of enemy movement
@@ -123,7 +125,6 @@ func _move_enemies():
 	direction_change_last_move = false
 	
 	if(enemy_reached_bound == true):
-		print("changing direction")
 		await _enemies_change_direction() # Make sure the direction switch is completed before moving laterally again. Had issues with race conditions
 		
 	enemy_reached_bound = false
@@ -141,12 +142,14 @@ func _enemies_change_direction():
 			
 			enemies[i][j].position.y += enemy_vert_movement_distance
 			
+			if enemies[i][j].position.y >= bottom:
+				_on_player_life_lost()
+				return
+			
 	# Reverse enemy horizontal direction
 	enemy_hori_movement_direction = -enemy_hori_movement_direction
 	
 	direction_change_last_move = true
-	
-	direction_switched.emit()
 	
 	return
 
@@ -230,6 +233,7 @@ func change_enemy_count():
 	$HUD.change_score(score)
 
 func _on_player_life_lost():
+	# Might be a race condition if a player gets shot at the same time that the enemies hit the bottom
 	lives -= 1
 
 	if(lives <= 0):
@@ -239,21 +243,20 @@ func _on_player_life_lost():
 	_reset_round()
 		
 func _reset_round():
-	_clear_enemies()
+	_clear_entities()
 	
 	_spawn_player()
 	_spawn_enemies()
 
 func _end_game():
-	_clear_enemies()
-	$Player.queue_free()
+	_clear_entities()
 	$HUD.game_over()
 	
 	if(score > high_score):
 		high_score = score
 		_save_high_score(high_score)
 	
-func _clear_enemies():
+func _clear_entities():
 	# Delete all remaining enemies and projectiles
 	for i in self.get_children():
 		if(i.has_method("destroy")):
@@ -299,7 +302,5 @@ func _get_high_score():
 	
 	# Get data from JSON object
 	var node_data = json.get_data()
-	
-	print(node_data["score"])
 	
 	return node_data["score"]

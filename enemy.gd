@@ -11,9 +11,11 @@ func _ready():
 func _process(delta):
 	pass
 
+
 func _on_area_entered(area):
 	queue_free()
 	enemy_destroyed.emit()
+
 
 func destroy():
 	queue_free()

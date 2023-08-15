@@ -22,7 +22,7 @@ func set_high_score(high_score):
 	$HighScore.set_text(str(high_score))
 	
 func _quit_game():
-	get_tree().queue_free()
+	get_tree().quit()
 	
 func game_over():
 	_toggle_in_game()

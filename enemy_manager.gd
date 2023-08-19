@@ -19,7 +19,7 @@ signal all_enemies_destroyed
 @export var projectile_scene: PackedScene
 
 ## Sprite for enemy projectiles
-var rocket_sprite = load("res://icon.svg")
+var rocket_sprite = load("res://assets/3x30.png")
 
 @export_category("Enemy Spawn Settings")
 
@@ -64,6 +64,10 @@ var bottom = 900
 ## Time between rows of enemies moving
 @export
 var enemy_row_movement_timer = 0.25
+
+## Delay between moving down and moving laterally again
+@export
+var enemy_move_downward_delay = 0.2
 
 ## Change in the enemies movement timer per enemy killed, moving to a percentage
 ## value set by final_enemy_movement_speed_percentage
@@ -132,8 +136,6 @@ func _spawn_enemies():
 			
 			_enemies[i][j].position = Vector2(x_tally, y_tally)
 			
-			print("i: ", i, " j: ", j)
-			
 			_enemies[i][j].enemy_destroyed.connect(on_enemy_destroyed)
 			
 			#add_child(_enemies[i][j])
@@ -161,8 +163,6 @@ func _move_enemies()-> void :
 			
 			_enemies[i][j].position.x += move_vector
 			
-			print(_enemies[i][j])
-			
 			# Once one enemy reaches the end, they wait for the current movement cycle to end, and then shift down and start moving the other direction
 			if((_enemies[i][j].position.x <= lateral_bound \
 					or _enemies[i][j].position.x >= _screen_size.x - lateral_bound) \
@@ -174,7 +174,7 @@ func _move_enemies()-> void :
 	_direction_change_last_move = false
 	
 	if(enemy_reached_bound == true):
-		_enemies_change_direction() # Make sure the direction switch is completed before moving laterally again. Had issues with race conditions
+		await _enemies_change_direction() # Make sure the direction switch is completed before moving laterally again. Had issues with race conditions
 		
 	enemy_reached_bound = false
 	
@@ -200,6 +200,8 @@ func _enemies_change_direction():
 	_enemy_hori_movement_direction = -_enemy_hori_movement_direction
 	
 	_direction_change_last_move = true
+	
+	await get_tree().create_timer(enemy_move_downward_delay).timeout
 	
 	return
 

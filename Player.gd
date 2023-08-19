@@ -4,17 +4,18 @@ extends Area2D
 signal life_lost
 
 @export var speed = 500
-@export var shoot_cooldown = 1000
+@export var shoot_cooldown = 0.5
 @export var projectile_scene: PackedScene
 
 var paddle_length
 var screen_size
 var last_shot = 0
 
-var rocket_sprite = load("res://icon.svg")
+var rocket_sprite = load("res://assets/2x20.png")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	shoot_cooldown *= 1000
 	screen_size = get_viewport_rect().size
 	paddle_length = $CollisionShape2D.shape.size.x / 2
 
@@ -43,6 +44,3 @@ func _shoot():
 
 func _on_area_entered(_area):
 	life_lost.emit()
-
-func destroy():
-	queue_free()

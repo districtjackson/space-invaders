@@ -4,10 +4,9 @@ extends Node2D
 @export var player_scene: PackedScene
 @export var enemy_manager_scene: PackedScene
 
-var rocket_sprite = load("res://icon.svg")
-
 # Statically typed enemy manager reference
 var _Enemy_Manager: Enemy_Manager
+var _Player: Player
 
 var _lives = 3
 var _score = 0
@@ -22,23 +21,26 @@ func _start_game() -> void:
 	$HUD.change_score(_score)
 	$HUD.set_high_score(_high_score)
 	
-	var Player = _spawn_player()
+	_Player = _spawn_player()
 	# Creates the enemy_manager_scene
-	_instantiate_enemies(Player)
+	_instantiate_enemies(_Player)
+	print(_Player)
 	
 	return
 
 
 func _spawn_player() -> Player:
-	var Player = player_scene.instantiate()
+	var player = player_scene.instantiate()
 	
-	Player.position = Vector2(490, 1200)
+	player.position = Vector2(490, 900)
 	
-	Player.life_lost.connect(_on_player_life_lost)
+	player.life_lost.connect(_on_player_life_lost)
 	
-	add_child(Player)
+	add_child(player)
 	
-	return Player
+	print("Player Spawned")
+	
+	return player
 
 
 # Create enemy_manager to handle all enemy behavior
@@ -48,6 +50,7 @@ func _instantiate_enemies(player: Player) -> void:
 	_Enemy_Manager.enemy_destroyed.connect(_on_enemy_destroyed)
 	# If enemy reaches bottom, player loses a life
 	_Enemy_Manager.enemy_reached_bottom.connect(_on_player_life_lost)
+	_Enemy_Manager.all_enemies_destroyed.connect(on_all_enemies_cleared)
 	
 	add_child(_Enemy_Manager)
 	
@@ -64,12 +67,14 @@ func _on_enemy_destroyed() -> void:
 
 
 func _on_player_life_lost() -> void:
+	print("Player Lost Life")
 	
 	# Might be a race condition if a player gets shot at the same time that the enemies hit the bottom
 	_lives -= 1
 
 	_Enemy_Manager.queue_free()
 	_clear_entities()
+	_destroy_player()
 
 	if(_lives <= 0):
 		_end_game()
@@ -79,8 +84,8 @@ func _on_player_life_lost() -> void:
 
 
 func _reset_round() -> void:
-	var Player = _spawn_player()
-	_instantiate_enemies(Player)
+	_Player = _spawn_player()
+	_instantiate_enemies(_Player)
 
 
 func _end_game() -> void:
@@ -93,7 +98,7 @@ func _end_game() -> void:
 
 func on_all_enemies_cleared() -> void:
 		_Enemy_Manager.queue_free()
-		
+		_instantiate_enemies(_Player)
 
 
 func _clear_entities() -> void:
@@ -101,6 +106,10 @@ func _clear_entities() -> void:
 	for i in self.get_children():
 		if(i.has_method("destroy")):
 			i.destroy()
+
+
+func _destroy_player() -> void:
+	_Player.queue_free()
 
 
 # Saves provided high score at user://space_invaders.save

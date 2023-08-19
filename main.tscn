@@ -2,22 +2,15 @@
 
 [ext_resource type="PackedScene" uid="uid://df6f78rc4ii6l" path="res://player.tscn" id="1_t7ckm"]
 [ext_resource type="Script" path="res://main.gd" id="1_ttow7"]
-[ext_resource type="PackedScene" uid="uid://w2bmr81oxqu1" path="res://enemy.tscn" id="2_w0tq7"]
 [ext_resource type="PackedScene" uid="uid://b6qpr5w3wnv6a" path="res://projectile.tscn" id="3_e8bls"]
+[ext_resource type="PackedScene" uid="uid://beef6mne1h5b3" path="res://enemy_manager.tscn" id="4_khjrj"]
 [ext_resource type="PackedScene" uid="uid://d06kqaajyk42e" path="res://hud.tscn" id="5_l25s5"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_ttow7")
-enemy_scene = ExtResource("2_w0tq7")
 projectile_scene = ExtResource("3_e8bls")
 player_scene = ExtResource("1_t7ckm")
-enemy_row_count = 6
-enemy_col_count = 5
-enemy_pos_x = 30
-enemy_pos_y = 100
-enemy_hori_distance = 100
-enemy_vert_distance = 100
-enemy_hori_movement_distance = 40
+enemy_manager_scene = ExtResource("4_khjrj")
 
 [node name="HUD" parent="." instance=ExtResource("5_l25s5")]
 

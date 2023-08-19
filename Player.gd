@@ -1,3 +1,4 @@
+class_name Player
 extends Area2D
 
 signal life_lost
@@ -40,7 +41,7 @@ func _shoot():
 	get_parent().add_child(rocket)
 	
 
-func _on_area_entered(area):
+func _on_area_entered(_area):
 	life_lost.emit()
 
 func destroy():

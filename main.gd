@@ -24,7 +24,6 @@ func _start_game() -> void:
 	_Player = _spawn_player()
 	# Creates the enemy_manager_scene
 	_instantiate_enemies(_Player)
-	print(_Player)
 	
 	return
 
@@ -37,8 +36,6 @@ func _spawn_player() -> Player:
 	player.life_lost.connect(_on_player_life_lost)
 	
 	call_deferred("add_child", player)
-	
-	print("Player Spawned at: ", player.position)
 	
 	return player
 
@@ -67,8 +64,6 @@ func _on_enemy_destroyed() -> void:
 
 
 func _on_player_life_lost() -> void:
-	print("Player Lost Life")
-	
 	# Might be a race condition if a player gets shot at the same time that the enemies hit the bottom
 	_lives -= 1
 
@@ -109,7 +104,6 @@ func _clear_entities() -> void:
 
 
 func _destroy_player() -> void:
-	print("Player destroyed")
 	_Player.queue_free()
 
 

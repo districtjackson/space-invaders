@@ -11,8 +11,6 @@ var paddle_length
 var screen_size
 var last_shot = 0
 
-var rocket_sprite = load("res://assets/2x20.png")
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	shoot_cooldown *= 1000
@@ -36,7 +34,6 @@ func _process(delta):
 
 func _shoot():
 	var rocket = projectile_scene.instantiate()
-	rocket.get_child(0).texture = rocket_sprite
 	rocket.position = Vector2(position.x, position.y - 130)
 	rocket.set_direction(1)
 	get_parent().add_child(rocket)

@@ -36,9 +36,9 @@ func _spawn_player() -> Player:
 	
 	player.life_lost.connect(_on_player_life_lost)
 	
-	add_child(player)
+	call_deferred("add_child", player)
 	
-	print("Player Spawned")
+	print("Player Spawned at: ", player.position)
 	
 	return player
 
@@ -109,6 +109,7 @@ func _clear_entities() -> void:
 
 
 func _destroy_player() -> void:
+	print("Player destroyed")
 	_Player.queue_free()
 
 

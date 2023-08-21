@@ -18,9 +18,6 @@ signal all_enemies_destroyed
 @export var enemy_scene: PackedScene
 @export var projectile_scene: PackedScene
 
-## Sprite for enemy projectiles
-var rocket_sprite = load("res://assets/3x30.png")
-
 @export_category("Enemy Spawn Settings")
 
 ## Number of columns in enemy grid
@@ -274,7 +271,6 @@ func _shoot_randomly():
 # Once the enemy to shoot is chosen, actually do the firing
 func _shoot_projectile(enemy):
 	var rocket = projectile_scene.instantiate()
-	rocket.get_child(0).texture = rocket_sprite # Choose enemy rocket texture
 	rocket.position = Vector2(enemy.position.x, enemy.position.y + 130) # Spawn beneath enemy
 	rocket.set_direction(-1)
 	add_child(rocket)

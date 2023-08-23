@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmu0jrlk52txe"]
+
+[ext_resource type="Script" path="res://mothership.gd" id="1_miolp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bokeb"]
+size = Vector2(100, 50)
+
+[node name="Mothership" type="Area2D"]
+script = ExtResource("1_miolp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_bokeb")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]

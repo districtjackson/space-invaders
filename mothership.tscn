@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://bmu0jrlk52txe"]
+[gd_scene load_steps=4 format=3 uid="uid://bmu0jrlk52txe"]
 
 [ext_resource type="Script" path="res://mothership.gd" id="1_miolp"]
+[ext_resource type="Texture2D" uid="uid://yhquwr0nast6" path="res://assets/100x50.png" id="2_1l1af"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bokeb"]
 size = Vector2(100, 50)
@@ -12,5 +13,6 @@ script = ExtResource("1_miolp")
 shape = SubResource("RectangleShape2D_bokeb")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_1l1af")
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]

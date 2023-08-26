@@ -1,6 +1,6 @@
 extends Area2D
 
-var speed = 300
+var speed = 600
 
 var screen_size
 var projectile_length

@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://085rsv1pv5uk"]
+[gd_scene load_steps=7 format=3 uid="uid://085rsv1pv5uk"]
 
 [ext_resource type="PackedScene" uid="uid://df6f78rc4ii6l" path="res://player.tscn" id="1_t7ckm"]
 [ext_resource type="Script" path="res://main.gd" id="1_ttow7"]
 [ext_resource type="PackedScene" uid="uid://drbkanrci017b" path="res://player_projectile.tscn" id="2_igpc0"]
 [ext_resource type="PackedScene" uid="uid://beef6mne1h5b3" path="res://enemy_manager.tscn" id="4_khjrj"]
+[ext_resource type="PackedScene" uid="uid://bmu0jrlk52txe" path="res://mothership.tscn" id="5_f5un8"]
 [ext_resource type="PackedScene" uid="uid://d06kqaajyk42e" path="res://hud.tscn" id="5_l25s5"]
 
 [node name="Main" type="Node2D"]
@@ -11,6 +12,7 @@ script = ExtResource("1_ttow7")
 projectile_scene = ExtResource("2_igpc0")
 player_scene = ExtResource("1_t7ckm")
 enemy_manager_scene = ExtResource("4_khjrj")
+mothership_scene = ExtResource("5_f5un8")
 
 [node name="HUD" parent="." instance=ExtResource("5_l25s5")]
 

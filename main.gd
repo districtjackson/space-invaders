@@ -3,14 +3,46 @@ extends Node2D
 @export var projectile_scene: PackedScene
 @export var player_scene: PackedScene
 @export var enemy_manager_scene: PackedScene
+@export var mothership_scene: PackedScene
+
+## How often (in seconds) the game rolls to spawn a mothership
+@export var mothership_spawn_cooldown = 5
+
+## Chance of mothership spawning on attempt
+@export var mothership_spawn_chance = 0.25
 
 # Statically typed enemy manager reference
 var _Enemy_Manager: Enemy_Manager
 var _Player: Player
+var _Mothership: Mothership
 
 var _lives = 3
 var _score = 0
 @onready var _high_score = _get_high_score()
+
+var _last_mothership_spawn_attempt = 0
+
+func _ready():
+	set_process(false)
+	
+	# Transform the seconds to milliseconds
+	mothership_spawn_cooldown *= 1000
+
+func _process(delta):
+	# Handles randomly spawning the mothership. Rolls to do so after a set
+	# amount of time
+	if _Mothership == null and (Time.get_ticks_msec() - _last_mothership_spawn_attempt) > mothership_spawn_cooldown:
+		_last_mothership_spawn_attempt = Time.get_ticks_msec()
+		
+		var random_number = randf()
+		
+		if random_number <= mothership_spawn_chance:
+			var side = randf()
+			
+			if side > 0.5:
+				_spawn_mothership(true)
+			else:
+				_spawn_mothership(false)
 
 
 ## Called by start button in main menu
@@ -24,6 +56,9 @@ func _start_game() -> void:
 	_Player = _spawn_player()
 	# Creates the enemy_manager_scene
 	_instantiate_enemies(_Player)
+	
+	# Starts the rolling for mothership spawn
+	set_process(true)
 	
 	return
 
@@ -55,12 +90,29 @@ func _instantiate_enemies(player: Player) -> void:
 	
 	return
 
+
+func _spawn_mothership(side):
+	_Mothership = mothership_scene.instantiate()
+	
+	_Mothership.mothership_destroyed.connect(on_mothership_destroyed)
+	
+	add_child(_Mothership)
+	
+	if side:
+		_Mothership.spawn_left()
+	else:
+		_Mothership.spawn_right()
+
+
 # Called when an enemy dies, telling main to decrease count of remaining enemies, increase score, and speed up enemies
 func _on_enemy_destroyed() -> void:
 	_score += 100
 	$HUD.change_score(_score)
-	
-	return
+
+
+func on_mothership_destroyed() -> void:
+	_score += 1000
+	$HUD.change_score(_score)
 
 
 func _on_player_life_lost() -> void:
@@ -89,6 +141,9 @@ func _end_game() -> void:
 	if(_score > _high_score):
 		_high_score = _score
 		_save_high_score(_high_score)
+		
+	# Stops the rolling for mothership spawn
+	set_process(false)
 
 
 func on_all_enemies_cleared() -> void:

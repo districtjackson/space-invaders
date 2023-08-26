@@ -1,6 +1,6 @@
 extends Area2D
 
-var speed = 300
+var speed = 600
 var direction = 1 # 1 for Up and -1 for down
 
 var screen_size

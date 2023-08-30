@@ -8,8 +8,8 @@
 script = ExtResource("1_kcf2t")
 enemy_scene = ExtResource("2_wi30d")
 projectile_scene = ExtResource("3_4xw08")
-enemy_start = Vector2(50, 100)
-enemy_hori_distance = 60
-enemy_vert_distance = 60
+enemy_start = Vector2(110, 150)
+enemy_vert_distance = 70
+enemy_hori_movement_distance = 5
+enemy_vert_movement_distance = 20
 lateral_bound = 50
-enemy_row_movement_timer = 0.5

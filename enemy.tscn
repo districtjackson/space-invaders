@@ -1,10 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://w2bmr81oxqu1"]
 
 [ext_resource type="Script" path="res://enemy.gd" id="1_4fmah"]
-[ext_resource type="Texture2D" uid="uid://3vvxoxbrl55m" path="res://assets/50x50.png" id="2_nmdfm"]
+[ext_resource type="Texture2D" uid="uid://d4dutv4cnu0ep" path="res://assets/40x40.png" id="2_1s64d"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xgrbm"]
-size = Vector2(50, 50)
+size = Vector2(40, 40)
 
 [node name="Enemy" type="Area2D"]
 collision_layer = 2
@@ -12,7 +12,7 @@ collision_mask = 2
 script = ExtResource("1_4fmah")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_nmdfm")
+texture = ExtResource("2_1s64d")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_xgrbm")

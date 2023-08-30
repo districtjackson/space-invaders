@@ -60,7 +60,7 @@ var bottom = 900
 
 ## Time between rows of enemies moving
 @export
-var enemy_row_movement_timer = 0.25
+var enemy_row_movement_timer = 0.2
 
 ## Delay between moving down and moving laterally again
 @export
@@ -77,7 +77,7 @@ var enemy_row_movement_timer_interval \
 ## Difficulty settings
 
 ## Target final value for enemy speed (as a percentage of base value)
-@export var final_enemy_movement_speed_percentage = 0.25 
+@export var final_enemy_movement_speed_percentage = 0.000001
 
 ## Cooldown between shots
 @export var enemy_shooting_cooldown = 3 
@@ -86,8 +86,9 @@ var enemy_row_movement_timer_interval \
 @onready var _remaining_enemies = enemy_row_count * enemy_col_count
 @onready var _screen_size = get_viewport_rect().size
 
-# Tells if the enemies need to changer their direction
-var _direction_change_last_move = false
+#keeps track if the enemies changed their direction in the last move cycle
+#so that the signal to change direction again (as the enemies 
+#var _direction_change_last_move = false
 
 # Direction enemies are currently going
 var _enemy_hori_movement_direction = 1
@@ -150,6 +151,12 @@ func _move_enemies()-> void :
 	var move_vector = enemy_hori_movement_distance * _enemy_hori_movement_direction
 	var enemy_reached_bound = false
 	
+	# Timers seem to have a minimum wait time that is preventing the last
+	# few blocks from moving as fast as I'd like, so this variable is used
+	# to skip the timer for empty columns to somewhat alleviate this
+	var _enemy_moved_in_column = false
+	
+	
 	for i in range(enemy_row_count - 1, -1, -1): # Rows. Works backwards because the bottom rows should move first
 		
 		for j in range(enemy_col_count): # Columns
@@ -158,24 +165,35 @@ func _move_enemies()-> void :
 			if(_enemies[i][j] == null):
 				continue
 			
+			_enemy_moved_in_column = true
+			
 			_enemies[i][j].position.x += move_vector
 			
-			# Once one enemy reaches the end, they wait for the current movement cycle to end, and then shift down and start moving the other direction
+			# Once one enemy reaches the end, they wait for the current
+			# movement cycle to end, and then shift down and start moving 
+			# the other direction
 			if((_enemies[i][j].position.x <= lateral_bound \
-					or _enemies[i][j].position.x >= _screen_size.x - lateral_bound) \
-					and _direction_change_last_move == false):
+					or _enemies[i][j].position.x \
+					>= _screen_size.x - lateral_bound)):
 				enemy_reached_bound = true
 			
-		await get_tree().create_timer(enemy_row_movement_timer).timeout # Pause between rows to recreate the staggered effect of enemy movement
-	
-	_direction_change_last_move = false
-	
+		if not _enemy_moved_in_column:
+			continue
+		else:
+			_enemy_moved_in_column = false
+		
+		# Pause between rows to recreate the staggered effect of enemy movement
+		await get_tree().create_timer(enemy_row_movement_timer).timeout 
+		
+	# Make sure the direction switch is completed before moving laterally 
+	# again. Had issues with race conditions
 	if(enemy_reached_bound == true):
-		await _enemies_change_direction() # Make sure the direction switch is completed before moving laterally again. Had issues with race conditions
+		await _enemies_change_direction() 
 		
 	enemy_reached_bound = false
 	
-	# Recursive movement, that way the only thing keeping time is the await timers in between row shifts
+	# Recursive movement, that way the only thing keeping time is the 
+	# await timers in between row shifts
 	_move_enemies()
 
 
@@ -196,7 +214,7 @@ func _enemies_change_direction():
 	# Reverse enemy horizontal direction
 	_enemy_hori_movement_direction = -_enemy_hori_movement_direction
 	
-	_direction_change_last_move = true
+	#_direction_change_last_move = true
 	
 	await get_tree().create_timer(enemy_move_downward_delay).timeout
 	

@@ -231,7 +231,7 @@ func _shoot_enemies():
 	# off the count with each one (if a column has zero aliens, it doesn't count)
 	# Once the counter is chosen, find the lowest alien and shoot.
 	
-	if(randf() > 0.2 and _Player != null):
+	if(randf() > 0.33 and _Player != null):
 		_shoot_at_player()
 	else:
 		_shoot_randomly()
@@ -264,7 +264,8 @@ func _shoot_at_player():
 
 # Chooses a random enemy to shoot
 func _shoot_randomly():
-	var random_counter = randi_range(1, enemy_row_count)
+	var random_counter = randi_range(1, enemy_col_count)
+	var column_chosen = false
 	var chosen_column = 0
 	
 	# Choose random column
@@ -275,9 +276,14 @@ func _shoot_randomly():
 				continue
 			elif(random_counter <= 0): # If counter is finished and this column has an enemy, choose it
 				chosen_column = j
+				column_chosen = true
+				break
 			else: # If column has an enemy, decrement the counter and move on
 				random_counter -= 1
 				break
+	
+		if(column_chosen == true):
+			break
 	
 	# Find lowest enemy
 	for i in range(enemy_row_count -1, -1, -1): # Start from the bottom

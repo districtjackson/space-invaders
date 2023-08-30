@@ -57,9 +57,6 @@ func _start_game() -> void:
 	# Creates the enemy_manager_scene
 	_instantiate_enemies(_Player, true)
 	
-	# Starts the rolling for mothership spawn
-	set_process(true)
-	
 	return
 
 
@@ -83,12 +80,23 @@ func _instantiate_enemies(player: Player, is_first_life) -> void:
 	# If enemy reaches bottom, player loses a life
 	_Enemy_Manager.enemy_reached_bottom.connect(_on_player_life_lost)
 	_Enemy_Manager.all_enemies_destroyed.connect(on_all_enemies_cleared)
+	_Enemy_Manager.enemies_spawned.connect(enemies_spawned)
 	
 	add_child(_Enemy_Manager)
 	
 	_Enemy_Manager.init(player, is_first_life) # Give player reference and start enemy spawn and motion
 	
 	return
+
+
+# Starts the rolling for mothership spawn when
+# all the enemies have been spawned
+func enemies_spawned():
+	# Move time up so it doesn't try to spawn
+	# immediately
+	_last_mothership_spawn_attempt = Time.get_ticks_msec()
+	
+	set_process(true)
 
 
 func _spawn_mothership(side):
@@ -120,8 +128,13 @@ func _on_player_life_lost() -> void:
 	_lives -= 1
 
 	_Enemy_Manager.queue_free()
+	
 	_clear_entities()
 	_destroy_player()
+	
+	# Do not spawn mothership while round is not
+	# active
+	set_process(false)
 
 	if(_lives <= 0):
 		_end_game()
@@ -147,8 +160,13 @@ func _end_game() -> void:
 
 
 func on_all_enemies_cleared() -> void:
-		_Enemy_Manager.queue_free()
-		_instantiate_enemies(_Player, false)
+	_Enemy_Manager.queue_free()
+		
+	# Do not spawn mothership while round is not
+	# active
+	set_process(false)
+		
+	_instantiate_enemies(_Player, false)
 
 
 func _clear_entities() -> void:

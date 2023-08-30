@@ -15,6 +15,9 @@ signal enemy_reached_bottom
 ## Triggered when remaining enemies is equal to 0
 signal all_enemies_destroyed
 
+## Triggered when enemies finish spawning
+signal enemies_spawned
+
 @export var enemy_scene: PackedScene
 @export var projectile_scene: PackedScene
 
@@ -159,6 +162,8 @@ func _spawn_enemies():
 		
 		x_tally = enemy_start.x
 		y_tally += enemy_vert_distance
+	
+	enemies_spawned.emit()
 	
 	return
 

@@ -94,7 +94,7 @@ var enemy_row_movement_timer_interval \
 var _enemy_hori_movement_direction = 1
 
 # Time since last enemy shot
-var _last_enemy_shot = 0
+@onready var _last_enemy_shot = Time.get_ticks_msec()
 
 # Passed through reference to player
 var _Player

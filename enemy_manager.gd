@@ -100,7 +100,7 @@ var enemy_row_movement_timer_interval \
 var _enemy_hori_movement_direction = 1
 
 # Time since last enemy shot
-@onready var _last_enemy_shot = Time.get_ticks_msec()
+var _last_enemy_shot
 
 # Passed through reference to player
 var _Player
@@ -119,6 +119,9 @@ func init(player, is_first_life):
 	
 	await _spawn_enemies()
 	_move_enemies()
+	
+	# Start shooting
+	_last_enemy_shot = Time.get_ticks_msec()
 	set_process(true)
 
 

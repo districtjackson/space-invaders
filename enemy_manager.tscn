@@ -13,3 +13,7 @@ enemy_vert_distance = 70
 enemy_hori_movement_distance = 5
 enemy_vert_movement_distance = 20
 lateral_bound = 50
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
+[connection signal="finished" from="AudioStreamPlayer" to="." method="_on_audio_stream_player_finished"]

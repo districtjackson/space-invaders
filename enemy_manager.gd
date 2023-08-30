@@ -20,6 +20,9 @@ signal all_enemies_destroyed
 
 @export_category("Enemy Spawn Settings")
 
+@onready
+var _audio_player = $AudioStreamPlayer
+
 ## Number of columns in enemy grid
 @export 
 var enemy_col_count: int = 11 
@@ -99,19 +102,26 @@ var _enemy_hori_movement_direction = 1
 # Passed through reference to player
 var _Player
 
+# Is true if this is the first life of the game, which is important
+# for the animation of how enemies spawn in
+var _first_life
+
 # Enemy grid
 var _enemies = []
 
 
-func init(player):
+func init(player, is_first_life):
 	_Player = player
+	_first_life = is_first_life
 	
-	_spawn_enemies()
+	await _spawn_enemies()
 	_move_enemies()
+	set_process(true)
 
 
 func _ready():
 	enemy_shooting_cooldown *= 1000
+	set_process(false)
 
 
 func _process(_delta):
@@ -140,6 +150,12 @@ func _spawn_enemies():
 			call_deferred("add_child", _enemies[i][j])
 			
 			x_tally += enemy_hori_distance
+			
+			if _first_life:
+				await get_tree().create_timer(0.1).timeout
+		
+		if !_first_life:
+			await get_tree().create_timer(0.2).timeout
 		
 		x_tally = enemy_start.x
 		y_tally += enemy_vert_distance
@@ -308,9 +324,10 @@ func on_enemy_destroyed():
 	
 	if(_remaining_enemies <= 0):
 		all_enemies_destroyed.emit()
-		
+
+
+func _on_audio_stream_player_finished() -> void:
+	# Increase tempo based on remaining_enemies
+	_audio_player.pitch_scale = 1 / (_remaining_enemies / enemy_row_count * enemy_col_count)
 	
-
-
-func _on_audio_stream_player_finished():
-	pass # Replace with function body.
+	_audio_player.play()

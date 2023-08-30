@@ -55,7 +55,7 @@ func _start_game() -> void:
 	
 	_Player = _spawn_player()
 	# Creates the enemy_manager_scene
-	_instantiate_enemies(_Player)
+	_instantiate_enemies(_Player, true)
 	
 	# Starts the rolling for mothership spawn
 	set_process(true)
@@ -76,7 +76,7 @@ func _spawn_player() -> Player:
 
 
 # Create enemy_manager to handle all enemy behavior
-func _instantiate_enemies(player: Player) -> void:
+func _instantiate_enemies(player: Player, is_first_life) -> void:
 	_Enemy_Manager = enemy_manager_scene.instantiate()
 	
 	_Enemy_Manager.enemy_destroyed.connect(_on_enemy_destroyed)
@@ -86,7 +86,7 @@ func _instantiate_enemies(player: Player) -> void:
 	
 	add_child(_Enemy_Manager)
 	
-	_Enemy_Manager.init(player) # Give player reference and start enemy spawn and motion
+	_Enemy_Manager.init(player, is_first_life) # Give player reference and start enemy spawn and motion
 	
 	return
 
@@ -132,7 +132,7 @@ func _on_player_life_lost() -> void:
 
 func _reset_round() -> void:
 	_Player = _spawn_player()
-	_instantiate_enemies(_Player)
+	_instantiate_enemies(_Player, false)
 
 
 func _end_game() -> void:
@@ -148,7 +148,7 @@ func _end_game() -> void:
 
 func on_all_enemies_cleared() -> void:
 		_Enemy_Manager.queue_free()
-		_instantiate_enemies(_Player)
+		_instantiate_enemies(_Player, false)
 
 
 func _clear_entities() -> void:

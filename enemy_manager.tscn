@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" path="res://enemy_manager.gd" id="1_kcf2t"]
 [ext_resource type="PackedScene" uid="uid://w2bmr81oxqu1" path="res://enemy.tscn" id="2_wi30d"]
-[ext_resource type="PackedScene" uid="uid://drbkanrci017b" path="res://player_projectile.tscn" id="3_4xw08"]
+[ext_resource type="PackedScene" uid="uid://cmanstmr4ryfm" path="res://enemy_projectile.tscn" id="3_wlx6c"]
 
 [node name="EnemyManager" type="Node2D"]
 script = ExtResource("1_kcf2t")
 enemy_scene = ExtResource("2_wi30d")
-projectile_scene = ExtResource("3_4xw08")
+projectile_scene = ExtResource("3_wlx6c")
 enemy_start = Vector2(110, 150)
 enemy_vert_distance = 70
 enemy_hori_movement_distance = 5

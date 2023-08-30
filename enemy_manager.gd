@@ -231,7 +231,7 @@ func _shoot_enemies():
 	# off the count with each one (if a column has zero aliens, it doesn't count)
 	# Once the counter is chosen, find the lowest alien and shoot.
 	
-	if(randf() < 0.2 and _Player != null):
+	if(randf() > 0.2 and _Player != null):
 		_shoot_at_player()
 	else:
 		_shoot_randomly()
@@ -290,7 +290,6 @@ func _shoot_randomly():
 func _shoot_projectile(enemy):
 	var rocket = projectile_scene.instantiate()
 	rocket.position = Vector2(enemy.position.x, enemy.position.y + 130) # Spawn beneath enemy
-	rocket.set_direction(-1)
 	add_child(rocket)
 	
 # Called when an enemy dies, telling main to decrease count of remaining enemies, increase score, and speed up enemies

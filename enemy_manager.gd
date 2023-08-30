@@ -308,4 +308,9 @@ func on_enemy_destroyed():
 	
 	if(_remaining_enemies <= 0):
 		all_enemies_destroyed.emit()
+		
 	
+
+
+func _on_audio_stream_player_finished():
+	pass # Replace with function body.

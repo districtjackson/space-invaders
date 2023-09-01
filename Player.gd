@@ -10,6 +10,7 @@ signal life_lost
 var paddle_length
 var screen_size
 var last_shot = 0
+var _firing_enabled: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -18,7 +19,8 @@ func _ready():
 	paddle_length = $CollisionShape2D.shape.size.x / 2
 
 func _process(delta):
-	if(Input.is_action_pressed("shoot") && (Time.get_ticks_msec() - last_shot) > shoot_cooldown):
+	if(Input.is_action_pressed("shoot") && (Time.get_ticks_msec() - last_shot) > shoot_cooldown
+			&& _firing_enabled):
 		_shoot()
 		last_shot = Time.get_ticks_msec()
 		
@@ -37,7 +39,12 @@ func _shoot():
 	rocket.position = Vector2(position.x, position.y - 130)
 	rocket.set_direction(1)
 	get_parent().add_child(rocket)
+
+func enable_shooting():
+	_firing_enabled = true
 	
+func disable_shooting():
+	_firing_enabled = false
 
 func _on_area_entered(_area):
 	life_lost.emit()

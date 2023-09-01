@@ -20,6 +20,12 @@ var _lives = 3
 var _score = 0
 @onready var _high_score = _get_high_score()
 
+# Tracks if the enemies were fully cleared by the player, rather than the player losing a life.
+# This is important, as the player will be in play while the enemies respawns, so it shouldn't try
+# to re-add the player to the tree, or allow the player to shoot until they are finished
+var _enemies_were_cleared: bool = false
+
+# Keeps time of latest mothership spawn attempt
 var _last_mothership_spawn_attempt = 0
 
 func _ready():
@@ -28,7 +34,7 @@ func _ready():
 	# Transform the seconds to milliseconds
 	mothership_spawn_cooldown *= 1000
 
-func _process(delta):
+func _process(_delta):
 	# Handles randomly spawning the mothership. Rolls to do so after a set
 	# amount of time
 	if _Mothership == null and (Time.get_ticks_msec() - _last_mothership_spawn_attempt) > mothership_spawn_cooldown:
@@ -53,24 +59,36 @@ func _start_game() -> void:
 	$HUD.change_score(_score)
 	$HUD.set_high_score(_high_score)
 	
-	_Player = _spawn_player()
+	_Player = _instantiate_player()
+	
 	# Creates the enemy_manager_scene
 	_instantiate_enemies(_Player, true)
 	
 	return
 
 
-func _spawn_player() -> Player:
+func _instantiate_player() -> Player:
 	var player = player_scene.instantiate()
 	
 	player.position = Vector2(490, 900)
 	
 	player.life_lost.connect(_on_player_life_lost)
 	
-	call_deferred("add_child", player)
-	
 	return player
 
+
+# Finishes preparing the player for the game round by either adding it to the scene
+# or enabling its shooting, and is called after the enemies finish spawning
+# the 
+func _initialize_player(player: Player) -> void:
+	if _enemies_were_cleared == false:
+		add_child(player)
+	else:
+		player.enable_shooting()
+		
+		_enemies_were_cleared == false
+		
+	
 
 # Create enemy_manager to handle all enemy behavior
 func _instantiate_enemies(player: Player, is_first_life) -> void:
@@ -84,7 +102,9 @@ func _instantiate_enemies(player: Player, is_first_life) -> void:
 	
 	add_child(_Enemy_Manager)
 	
-	_Enemy_Manager.init(player, is_first_life) # Give player reference and start enemy spawn and motion
+	await _Enemy_Manager.init(player, is_first_life) # Give player reference and start enemy spawn and motion
+	
+	_initialize_player(player)
 	
 	return
 
@@ -92,6 +112,8 @@ func _instantiate_enemies(player: Player, is_first_life) -> void:
 # Starts the rolling for mothership spawn when
 # all the enemies have been spawned
 func enemies_spawned():
+	
+	
 	# Move time up so it doesn't try to spawn
 	# immediately
 	_last_mothership_spawn_attempt = Time.get_ticks_msec()
@@ -144,7 +166,7 @@ func _on_player_life_lost() -> void:
 
 
 func _reset_round() -> void:
-	_Player = _spawn_player()
+	_Player = _instantiate_player()
 	_instantiate_enemies(_Player, false)
 
 
@@ -160,10 +182,12 @@ func _end_game() -> void:
 
 
 func on_all_enemies_cleared() -> void:
+	_enemies_were_cleared = true
+	_Player.disable_shooting()
+	
 	_Enemy_Manager.queue_free()
 		
-	# Do not spawn mothership while round is not
-	# active
+	# Do not spawn mothership while round is not active
 	set_process(false)
 		
 	_instantiate_enemies(_Player, false)
